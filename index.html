@@ -213,6 +213,28 @@
             opacity: 1;
         }
     </style>
+    <!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_TRACKING_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YOUR_TRACKING_ID');
+</script>
+
+<!-- Matomo Analytics -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//your-matomo-url.com/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', 'YOUR_SITE_ID']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
 </head>
 <body class="min-h-screen p-4 md:p-6">
     <div class="max-w-7xl mx-auto">
@@ -664,9 +686,10 @@
     
     <!-- Footer -->
     <footer class="mt-8 text-center text-gray-600 text-sm">
-        <p>© 2023 Health Hub Pro. All rights reserved.</p>
-        <p class="mt-1">Disclaimer: This app is for informational purposes only and does not provide medical advice.</p>
-    </footer>
+  <p>© 2025 Health Hub Pro. All rights reserved.</p>
+  <p class="mt-1">Disclaimer: This app is for informational purposes only and does not provide medical advice.</p>
+</footer>
+    <p>© <script>document.write(new Date().getFullYear())</script> Health Hub Pro. All rights reserved.</p>
     
     <!-- Modals -->
     <!-- Water Intake Modal -->
@@ -1227,6 +1250,104 @@ closeReportsModalBtn.addEventListener('click', () => {
     <div class="mt-6 flex justify-end">
       <button id="closeReportsModalBtn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
         Close
+      </button>
+    </div>
+  </div>
+</div>
+    <!-- Refill Reminder Modal -->
+<div id="refillModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md animate__animated animate__fadeInUp">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold text-gray-800">Medication Refill Reminder</h3>
+      <button id="closeRefillModal" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="mb-4">
+      <label for="refillMedication" class="block text-sm font-medium text-gray-700 mb-2">Medication</label>
+      <select id="refillMedication" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+        <option value="">Select Medication</option>
+          // Refill Reminder Modal
+const refillModal = document.getElementById('refillModal');
+const closeRefillModal = document.getElementById('closeRefillModal');
+const cancelRefillBtn = document.getElementById('cancelRefillBtn');
+const saveRefillBtn = document.getElementById('saveRefillBtn');
+
+// Add refill reminder button to each medication (add this to your medication creation code)
+function addRefillButton(item, medName) {
+  const refillBtn = document.createElement('button');
+  refillBtn.className = 'w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center hover:bg-yellow-200 transition-colors tooltip';
+  refillBtn.innerHTML = '<i class="fas fa-prescription-bottle-alt"></i><span class="tooltip-text">Set Refill Reminder</span>';
+  
+  refillBtn.addEventListener('click', () => {
+    refillModal.classList.remove('hidden');
+    document.getElementById('refillMedication').innerHTML = `
+      <option value="${medName}" selected>${medName}</option>
+    `;
+  });
+  
+  item.querySelector('.flex.items-center.space-x-2').prepend(refillBtn);
+}
+
+// Update your medication creation code to include:
+// addRefillButton(newMedication, medName);
+
+// Close refill modal
+closeRefillModal.addEventListener('click', () => {
+  refillModal.classList.add('hidden');
+});
+
+cancelRefillBtn.addEventListener('click', () => {
+  refillModal.classList.add('hidden');
+});
+
+// Save refill reminder
+saveRefillBtn.addEventListener('click', () => {
+  const medication = document.getElementById('refillMedication').value;
+  const refillDate = document.getElementById('refillDate').value;
+  const daysBefore = document.getElementById('refillDaysBefore').value;
+  
+  if (!medication || !refillDate) {
+    showToast('Please select medication and refill date', 'danger');
+    return;
+  }
+  
+  // Calculate reminder date
+  const refill = new Date(refillDate);
+  const reminderDate = new Date(refill);
+  reminderDate.setDate(refill.getDate() - parseInt(daysBefore));
+  
+  showToast(`Reminder set for ${medication} on ${reminderDate.toDateString()}`, 'success');
+  refillModal.classList.add('hidden');
+  
+  // In a real app, you would save this to a database
+  // and set up actual notifications
+});
+        <!-- Options will be populated by JavaScript -->
+      </select>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label for="refillDate" class="block text-sm font-medium text-gray-700 mb-2">Refill Date</label>
+        <input type="date" id="refillDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+      </div>
+      <div>
+        <label for="refillDaysBefore" class="block text-sm font-medium text-gray-700 mb-2">Remind Before</label>
+        <select id="refillDaysBefore" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+          <option value="1">1 day before</option>
+          <option value="3">3 days before</option>
+          <option value="7" selected>1 week before</option>
+          <option value="14">2 weeks before</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="flex justify-end space-x-3">
+      <button id="cancelRefillBtn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+      <button id="saveRefillBtn" class="highlight-btn bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+        <i class="fas fa-bell mr-2"></i> Set Reminder
       </button>
     </div>
   </div>
