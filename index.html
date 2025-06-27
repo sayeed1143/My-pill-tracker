@@ -1,289 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Health Buddy</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f9ff;
-            color: #333;
-        }
-        h1 {
-            color: #2a6496;
-            text-align: center;
-        }
-        .section {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        input, select, button {
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #med-list {
-            margin-top: 15px;
-        }
-        .med-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        #map {
-            height: 300px;
-            width: 100%;
-            border-radius: 8px;
-        }
-        #water-result {
-            font-weight: bold;
-            color: #2a6496;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Simple daily medication reminder and tracker">
+  <title>My Daily Meds Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    form, .med-list {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .entry {
+      padding: 10px;
+      margin-top: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
 </head>
 <body>
-    <h1>💊 Smart Health Buddy</h1>
 
-    <!-- Medicine Tracker -->
-    <div class="section">
-        <h2>Medicine Reminder</h2>
-        <input type="text" id="med-name" placeholder="Medicine name (e.g., Paracetamol)">
-        <select id="med-time">
-            <option value="08:00">Morning (8 AM)</option>
-            <option value="13:00">Afternoon (1 PM)</option>
-            <option value="20:00">Night (8 PM)</option>
-        </select>
-        <select id="meal-time">
-            <option value="before">Before Meal</option>
-            <option value="after">After Meal</option>
-        </select>
-        <button id="add-med">Add Reminder</button>
-        <div id="med-list"></div>
-    </div>
+  <h1>💊 My Daily Meds Tracker</h1>
 
-    <!-- Water Calculator -->
-    <div class="section">
-        <h2>💧 Water Intake Calculator</h2>
-        <input type="number" id="user-age" placeholder="Your age" min="1" max="120">
-        <button id="calculate-water">Calculate My Water Goal</button>
-        <div id="water-result"></div>
-    </div>
+  <form id="medForm">
+    <label>Medicine Name:</label>
+    <input type="text" id="medName" required>
 
-    <!-- Medicine Information -->
-    <div class="section">
-        <h2>Medicine Information</h2>
-        <input type="text" id="med-search" placeholder="Search medicine (e.g., Ibuprofen)">
-        <button id="search-med">Search</button>
-        <div id="med-result" style="margin-top: 10px;"></div>
-    </div>
+    <label>Time of Day:</label>
+    <select id="medTime">
+      <option value="Morning">Morning</option>
+      <option value="Afternoon">Afternoon</option>
+      <option value="Night">Night</option>
+    </select>
 
-    <!-- Pharmacy Locator -->
-    <div class="section">
-        <h2>🛍️ Find Pharmacies Nearby</h2>
-        <div id="map"></div>
-        <p style="text-align: center; margin-top: 10px;">
-            <a href="https://www.amazon.com/s?k=medical+supplies" target="_blank" style="color: #2a6496;">
-                🔍 Can't find? Buy medicines online
-            </a>
-        </p>
-    </div>
+    <label>When to Take:</label>
+    <select id="mealTime">
+      <option value="Before Meal">Before Meal</option>
+      <option value="After Meal">After Meal</option>
+    </select>
 
-    <!-- Support Button -->
-    <div style="text-align: center; margin-top: 30px;">
-        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
-        <script>
-            kofiWidgetOverlay.draw('yourkofiid', {
-                'type': 'floating-chat',
-                'floating-chat.donateButton.text': 'Support Us',
-                'floating-chat.donateButton.background-color': '#2a6496'
-            });
-        </script>
-    </div>
+    <button type="submit">Add Medication</button>
+  </form>
 
-    <script>
-        // ===== MEDICINE REMINDER =====
-        const medList = [];
-        
-        document.getElementById('add-med').addEventListener('click', function() {
-            const name = document.getElementById('med-name').value;
-            const time = document.getElementById('med-time').value;
-            const meal = document.getElementById('meal-time').value;
-            
-            if (!name) return alert("Please enter medicine name!");
-            
-            const med = { name, time, meal };
-            medList.push(med);
-            updateMedList();
-            setMedReminder(med);
-            
-            document.getElementById('med-name').value = '';
-        });
+  <div class="med-list" id="medList">
+    <h3>📝 Today's Medications</h3>
+    <div id="medEntries"></div>
+  </div>
 
-        function updateMedList() {
-            const listElement = document.getElementById('med-list');
-            listElement.innerHTML = medList.map(med => `
-                <div class="med-item">
-                    <strong>${med.name}</strong> - ${formatTime(med.time)} (${med.meal === 'before' ? 'Before' : 'After'} meal)
-                </div>
-            `).join('');
-        }
+  <script>
+    const form = document.getElementById('medForm');
+    const entriesDiv = document.getElementById('medEntries');
 
-        function setMedReminder(med) {
-            const now = new Date();
-            const [hours, minutes] = med.time.split(':').map(Number);
-            const reminderTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
-            
-            if (now > reminderTime) {
-                reminderTime.setDate(reminderTime.getDate() + 1);
-            }
-            
-            const timeout = reminderTime - now;
-            
-            setTimeout(() => {
-                if (Notification.permission === 'granted') {
-                    new Notification(`💊 Time to take ${med.name}`, {
-                        body: `Remember to take it ${med.meal === 'before' ? 'before' : 'after'} your meal`
-                    });
-                } else if (Notification.permission !== 'denied') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            new Notification(`💊 Time to take ${med.name}`);
-                        }
-                    });
-                }
-                
-                // Repeat daily
-                setMedReminder(med);
-            }, timeout);
-        }
+    // Load meds from localStorage
+    function loadMeds() {
+      const meds = JSON.parse(localStorage.getItem('myMeds')) || [];
+      entriesDiv.innerHTML = '';
+      meds.forEach((med, index) => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `<strong>${med.name}</strong> - ${med.time} (${med.meal})`;
+        entriesDiv.appendChild(div);
 
-        // ===== WATER CALCULATOR =====
-        document.getElementById('calculate-water').addEventListener('click', function() {
-            const age = parseInt(document.getElementById('user-age').value);
-            if (!age || age < 1) return alert("Please enter valid age!");
-            
-            let waterAmount;
-            if (age < 30) waterAmount = 2.7;
-            else if (age < 55) waterAmount = 3.7;
-            else waterAmount = 2.5;
-            
-            document.getElementById('water-result').innerHTML = `
-                You should drink <strong>${waterAmount} liters</strong> of water daily.
-                <button onclick="setWaterReminders()" style="margin-left: 10px;">Set Reminders</button>
-            `;
-        });
+        // Optional: Notification
+        scheduleNotification(med.name, med.time);
+      });
+    }
 
-        function setWaterReminders() {
-            if (Notification.permission !== 'granted') {
-                Notification.requestPermission();
-            }
-            
-            // Set reminders every 2 hours from 8AM to 8PM
-            for (let hour = 8; hour <= 20; hour += 2) {
-                const now = new Date();
-                const reminderTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, 0);
-                
-                if (now > reminderTime) {
-                    reminderTime.setDate(reminderTime.getDate() + 1);
-                }
-                
-                setTimeout(() => {
-                    if (Notification.permission === 'granted') {
-                        new Notification('💧 Time to drink water!');
-                    }
-                    // Repeat daily
-                    setWaterReminders();
-                }, reminderTime - now);
-            }
-            
-            alert('Water reminders set for every 2 hours!');
-        }
+    // Save meds
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('medName').value;
+      const time = document.getElementById('medTime').value;
+      const meal = document.getElementById('mealTime').value;
 
-        // ===== MEDICINE INFORMATION =====
-        const medDatabase = {
-            "paracetamol": {
-                use: "Pain and fever relief",
-                when: "Can be taken before or after meals",
-                sideEffects: "Rare at normal doses"
-            },
-            "ibuprofen": {
-                use: "Pain, inflammation, and fever",
-                when: "Best taken with food",
-                sideEffects: "May cause stomach irritation"
-            },
-            "omeprazole": {
-                use: "Reduces stomach acid",
-                when: "Take before breakfast",
-                sideEffects: "Headache, diarrhea (rare)"
-            }
-            // Add more medicines as needed
-        };
+      const meds = JSON.parse(localStorage.getItem('myMeds')) || [];
+      meds.push({ name, time, meal });
+      localStorage.setItem('myMeds', JSON.stringify(meds));
+      form.reset();
+      loadMeds();
+    });
 
-        document.getElementById('search-med').addEventListener('click', function() {
-            const query = document.getElementById('med-search').value.toLowerCase();
-            const result = medDatabase[query];
-            
-            if (result) {
-                document.getElementById('med-result').innerHTML = `
-                    <h3>${query.charAt(0).toUpperCase() + query.slice(1)}</h3>
-                    <p><strong>Use:</strong> ${result.use}</p>
-                    <p><strong>When to take:</strong> ${result.when}</p>
-                    <p><strong>Possible side effects:</strong> ${result.sideEffects}</p>
-                `;
-            } else {
-                document.getElementById('med-result').innerHTML = "Medicine not found. Please consult a doctor.";
-            }
-        });
+    // Notification scheduler (basic simulation)
+    function scheduleNotification(name, time) {
+      if (Notification.permission === 'granted') {
+        setTimeout(() => {
+          new Notification(`Reminder: Take ${name} (${time})`);
+        }, 3000); // ⏱ Simulated delay
+      }
+    }
 
-        // ===== HELPER FUNCTIONS =====
-        function formatTime(timeStr) {
-            const [hours, minutes] = timeStr.split(':');
-            const hourNum = parseInt(hours);
-            return hourNum > 12 ? `${hourNum - 12}:${minutes} PM` : `${hourNum}:${minutes} AM`;
-        }
+    // Ask permission once
+    if (Notification.permission !== 'granted') {
+      Notification.requestPermission();
+    }
 
-        // ===== PHARMACY MAP =====
-        function initMap() {
-            // This is a placeholder - you'll need a Google Maps API key for full functionality
-            document.getElementById('map').innerHTML = `
-                <p style="text-align: center; padding: 50px;">
-                    🔍 Enable location to find nearby pharmacies<br>
-                    <small>(Google Maps integration requires API key)</small>
-                </p>
-            `;
-        }
+    loadMeds();
+  </script>
 
-        // Initialize on load
-        window.onload = function() {
-            initMap();
-            
-            // Request notification permission
-            if (Notification.permission !== 'granted') {
-                Notification.requestPermission();
-            }
-        };
-    </script>
-
-    <!-- AdSense Placeholder -->
-    <div style="margin: 30px auto; padding: 20px; background: #f5f5f5; text-align: center;">
-        [AdSense will appear here after approval]
-    </div>
 </body>
 </html>
