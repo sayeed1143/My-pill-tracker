@@ -77,6 +77,19 @@
     <h3>📝 Today's Medications</h3>
     <div id="medEntries"></div>
   </div>
+<h2>💧 Daily Water Intake Calculator</h2>
+<p>Stay hydrated for better health</p>
+<form id="water-form">
+  <label>Enter your Age:</label><br>
+  <input type="number" id="user-age" required><br><br>
+
+  <label>Enter Your City (for weather):</label><br>
+  <input type="text" id="user-city" required><br><br>
+
+  <button type="submit">Calculate Water Intake</button>
+</form>
+
+<div id="water-result" style="margin-top: 20px;"></div>
 
   <script>
     const form = document.getElementById('medForm');
@@ -127,6 +140,42 @@
 
     loadMeds();
   </script>
+<script>
+  document.getElementById("water-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const age = parseInt(document.getElementById("user-age").value);
+    const city = document.getElementById("user-city").value;
+    const result = document.getElementById("water-result");
 
+    result.innerHTML = "Calculating...";
+
+    try {
+      // Get coordinates from OpenCage (free or use static fallback)
+      const geoResp = await fetch(`https://geocode.maps.co/search?q=${encodeURIComponent(city)}`);
+      const geoData = await geoResp.json();
+      const lat = geoData[0].lat;
+      const lon = geoData[0].lon;
+
+      // Get temperature using Open-Meteo
+      const weatherResp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+      const weatherData = await weatherResp.json();
+      const temp = weatherData.current_weather.temperature;
+
+      // Water intake logic
+      let baseWater = (age < 18) ? 1.5 : (age < 50 ? 2.5 : 2.0); // base in liters
+      if (temp > 30) baseWater += 0.5;
+      if (temp > 38) baseWater += 1.0;
+
+      result.innerHTML = `
+        <p>🌡 Current Temperature: ${temp}°C</p>
+        <p>💧 Recommended Water Intake: <strong>${baseWater.toFixed(1)} liters</strong> per day</p>
+        <p><small>*Based on age and weather in ${city}</small></p>
+      `;
+    } catch (err) {
+      result.innerHTML = "Could not fetch weather info. Please try again.";
+      console.error(err);
+    }
+  });
+</script>
 </body>
 </html>
