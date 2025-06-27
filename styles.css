@@ -1,18 +1,4 @@
-:root {
-    --primary: #4f46e5;
-    --secondary: #10b981;
-    --accent: #f59e0b;
-    --danger: #ef4444;
-    --info: #3b82f6;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #f0f4ff 0%, #e6f7ff 100%);
-    min-height: 100vh;
-    color: #1f2937;
-}
-
+/* Glass card effect */
 .glass-card {
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
@@ -28,32 +14,27 @@ body {
     box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
 }
 
-/* Add all other CSS rules from the original style tag */
-/* ... (copy all CSS content from the original style tag) ... */
-
-/* Tooltip styles */
-.tooltip {
+/* Water wave animation */
+.water-wave {
     position: relative;
+    overflow: hidden;
 }
 
-.tooltip .tooltip-text {
-    visibility: hidden;
-    width: 120px;
-    background-color: #374151;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
+.water-wave::after {
+    content: "";
     position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: rotate(30deg);
+    animation: wave 5s linear infinite;
 }
 
-.tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
+@keyframes wave {
+    0% { transform: rotate(30deg) translate(-10%, -10%); }
+    100% { transform: rotate(30deg) translate(10%, 10%); }
 }
+
+/* Add all other custom styles here */
