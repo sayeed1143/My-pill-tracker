@@ -1,93 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Did I Take My Meds Today?</title>
-  <meta name="description" content="Never forget your pills again - One-click medication tracker">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>💊 Did I Take My Meds Today?</title>
+  <meta name="description" content="A simple, one-click daily pill tracker. Never forget your meds again. Works offline!">
+  <meta property="og:title" content="Did I Take My Meds Today?">
+  <meta property="og:description" content="A simple, one-click daily medication reminder app.">
+  <meta property="og:image" content="https://your-site.com/preview.png">
+  <meta property="og:url" content="https://your-site.com">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2936/2936905.png" type="image/png">
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
       text-align: center;
+      transition: background 0.3s, color 0.3s;
+    }
+    .container {
       max-width: 400px;
-      margin: 0 auto;
       padding: 20px;
     }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    #date {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 20px;
+    }
     #pill-button {
-      width: 200px;
-      height: 200px;
+      width: 180px;
+      height: 180px;
       border-radius: 50%;
       border: none;
       font-size: 24px;
       cursor: pointer;
-      margin: 30px auto;
-      transition: all 0.3s;
+      transition: background 0.3s;
     }
     .taken {
-      background: #4CAF50;
-      color: white;
+      background-color: #4CAF50;
+      color: #fff;
     }
     .not-taken {
-      background: #FF5252;
-      color: white;
+      background-color: #FF5252;
+      color: #fff;
     }
     #reset-btn {
-      padding: 10px 20px;
-      background: #333;
+      margin-top: 15px;
+      padding: 10px 18px;
+      background: #444;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #dark-toggle {
+      margin-top: 25px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #888;
+      text-decoration: underline;
+    }
+    .dark {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+    .dark #pill-button.taken {
+      background-color: #388e3c;
+    }
+    .dark #pill-button.not-taken {
+      background-color: #d32f2f;
+    }
+    .adsense, .affiliate {
+      margin: 20px 0;
+      padding: 15px;
+      background: #eee;
+      border-radius: 8px;
+    }
+    a {
+      color: #1976D2;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <h1>💊 Did I Take My Meds Today?</h1>
-  <p id="date"></p>
-  
-  <button id="pill-button" class="not-taken">NO</button>
-  
-  <p>Click above when you take your medication</p>
-  <button id="reset-btn">Reset for Tomorrow</button>
+  <div class="container">
+    <h1>💊 Did I Take My Meds Today?</h1>
+    <p id="date"></p>
+    <button id="pill-button" class="not-taken">NO</button>
+    <p>Click the button when you've taken your meds today.</p>
+    <button id="reset-btn">Reset for Tomorrow</button>
 
-  <!-- AdSense Placeholder -->
-  <div style="margin: 30px auto; padding: 20px; background: #f5f5f5;">
-    [AdSense will go here]
+    <div class="adsense">[🧾 Your AdSense Code Here]</div>
+    <div class="affiliate">
+      Recommended: <a href="#" id="amazon-link" target="_blank">Best Pill Organizer</a>
+    </div>
+
+    <div id="dark-toggle">🌙 Toggle Dark Mode</div>
   </div>
 
-  <!-- Affiliate link placeholder -->
-  <p>Recommended: <a href="#" id="amazon-link">Pill Organizer</a></p>
-
   <script>
-    // Set today's date
-    document.getElementById('date').textContent = new Date().toDateString();
-    
-    // Check localStorage
     const today = new Date().toDateString();
-    const lastTaken = localStorage.getItem('lastTakenDate');
-    const button = document.getElementById('pill-button');
-    
+    document.getElementById("date").textContent = today;
+
+    const button = document.getElementById("pill-button");
+    const lastTaken = localStorage.getItem("lastTaken");
+
     if (lastTaken === today) {
-      button.textContent = 'YES';
-      button.classList.add('taken');
-      button.classList.remove('not-taken');
+      button.textContent = "YES";
+      button.classList.add("taken");
     }
-    
-    // Button click handler
-    button.addEventListener('click', () => {
-      button.textContent = 'YES';
-      button.classList.add('taken');
-      button.classList.remove('not-taken');
-      localStorage.setItem('lastTakenDate', today);
+
+    button.addEventListener("click", () => {
+      button.textContent = "YES";
+      button.classList.remove("not-taken");
+      button.classList.add("taken");
+      localStorage.setItem("lastTaken", today);
     });
-    
-    // Reset for next day
-    document.getElementById('reset-btn').addEventListener('click', () => {
-      button.textContent = 'NO';
-      button.classList.add('not-taken');
-      button.classList.remove('taken');
+
+    document.getElementById("reset-btn").addEventListener("click", () => {
+      button.textContent = "NO";
+      button.classList.remove("taken");
+      button.classList.add("not-taken");
     });
-    
-    // Affiliate link (replace with your Amazon Associates link)
-    document.getElementById('amazon-link').href = 
-      "https://www.amazon.com/s?k=pill+organizer&tag=yourtag-20";
+
+    document.getElementById("amazon-link").href = "https://www.amazon.com/s?k=pill+organizer&tag=yourtag-20";
+
+    // Dark mode toggle
+    const toggle = document.getElementById("dark-toggle");
+    const root = document.body;
+    if (localStorage.getItem("darkMode") === "true") root.classList.add("dark");
+
+    toggle.addEventListener("click", () => {
+      root.classList.toggle("dark");
+      localStorage.setItem("darkMode", root.classList.contains("dark"));
+    });
   </script>
 </body>
 </html>
