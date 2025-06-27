@@ -1,212 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medication Reminder App</title>
-    <!-- Tailwind CSS CDN for modern styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter for a clean, readable font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Custom styles for the body to center the app and apply a background */
-        body {
-            font-family: 'Inter', sans-serif; /* Apply Inter font */
-            background-color: #f0f4f8; /* Light blue-gray background */
-            display: flex; /* Use flexbox for centering */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-            min-height: 100vh; /* Full viewport height */
-            margin: 0; /* Remove default margin */
-            padding: 1rem; /* Add some padding around the content */
-            box-sizing: border-box; /* Include padding in element's total width and height */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Did I Take My Meds Today?</title>
+  <meta name="description" content="Track your daily medications with one click. Free, private, and simple pill tracker.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f7f9fc;
+    }
+    h1 {
+      color: #333;
+    }
+    .date {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .med-list {
+      margin-top: 20px;
+    }
+    .med {
+      margin: 10px auto;
+      padding: 10px;
+      max-width: 300px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .taken {
+      background-color: #c8e6c9;
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    #addMedForm {
+      margin-top: 30px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      width: 200px;
+    }
+    .progress {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
 </head>
-<body class="p-4">
-    <!-- Main container for the application, styled with Tailwind for responsiveness and aesthetics -->
-    <div class="container mx-auto p-4 max-w-lg bg-white rounded-xl shadow-2xl border border-gray-200">
+<body>
 
-        <!-- Initial Question Section - visible on load -->
-        <div id="initialQuestion" class="bg-blue-50 p-6 rounded-lg shadow-inner mb-6 text-center">
-            <p class="text-xl font-semibold text-blue-800 mb-6">Do you want to generate a medication reminder?</p>
-            <div class="flex justify-center space-x-6">
-                <!-- Yes Button: styled with Tailwind for a modern look and hover effects -->
-                <button id="yesButton" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full
-                                               shadow-lg transform hover:scale-105 transition duration-300 ease-in-out
-                                               focus:outline-none focus:ring-4 focus:ring-green-300">
-                    Yes
-                </button>
-                <!-- No Button: styled similarly to the Yes button -->
-                <button id="noButton" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full
-                                              shadow-lg transform hover:scale-105 transition duration-300 ease-in-out
-                                              focus:outline-none focus:ring-4 focus:ring-red-300">
-                    No
-                </button>
-            </div>
-        </div>
+  <h1>💊 Did I Take My Meds Today?</h1>
+  <p class="date" id="today-date"></p>
 
-        <!-- Reminder Generation Section - initially hidden, shown when 'Yes' is clicked -->
-        <div id="reminderSection" class="hidden bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Medication Reminder Generator</h2>
-            <div class="mb-5">
-                <label for="medicationName" class="block text-gray-700 text-base font-semibold mb-2">Medication Name:</label>
-                <!-- Input field for medication name, with rounded corners and focus styles -->
-                <input type="text" id="medicationName" placeholder="e.g., Ibuprofen, Insulin"
-                       class="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-800 leading-tight
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200">
-            </div>
-            <!-- Button to trigger reminder generation -->
-            <button id="generateReminderButton" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg
-                                                        focus:outline-none focus:shadow-outline w-full mb-5
-                                                        transform hover:scale-105 transition duration-300 ease-in-out">
-                Generate Reminder Message
-            </button>
-            <!-- Loading indicator, shown while the API call is in progress -->
-            <div id="loadingIndicator" class="hidden text-center text-indigo-600 font-semibold mb-5 p-2 bg-indigo-50 rounded-md">
-                Generating reminder... Please wait.
-            </div>
-            <!-- Area to display the generated reminder message -->
-            <div id="reminderOutput" class="bg-gray-100 p-5 rounded-lg text-gray-800 break-words whitespace-pre-wrap
-                                             min-h-[120px] border border-gray-200 shadow-inner overflow-auto text-lg leading-relaxed">
-                <!-- Placeholder text for the output area -->
-                <p class="text-gray-500 text-sm">Your generated medication reminder will appear here.</p>
-            </div>
-        </div>
-    </div>
+  <div id="medList" class="med-list"></div>
 
-    <script type="module">
-        // Ensure the DOM is fully loaded before executing JavaScript
-        document.addEventListener('DOMContentLoaded', () => {
-            // Get references to all necessary DOM elements
-            const initialQuestion = document.getElementById('initialQuestion');
-            const yesButton = document.getElementById('yesButton');
-            const noButton = document.getElementById('noButton');
-            const reminderSection = document.getElementById('reminderSection');
-            const medicationNameInput = document.getElementById('medicationName');
-            const generateReminderButton = document.getElementById('generateReminderButton');
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const reminderOutput = document.getElementById('reminderOutput');
+  <div id="addMedForm">
+    <input type="text" id="medInput" placeholder="Add medication name">
+    <button onclick="addMed()">Add</button>
+  </div>
 
-            // API configuration for the Gemini 2.0 Flash model
-            // The `apiKey` will be automatically provided by the Canvas environment at runtime.
-            // DO NOT hardcode your API key here.
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  <p class="progress" id="progressText"></p>
 
-            /**
-             * Event listener for the 'Yes' button.
-             * Hides the initial question and shows the reminder generation section.
-             */
-            yesButton.addEventListener('click', () => {
-                initialQuestion.classList.add('hidden'); // Hide the initial question
-                reminderSection.classList.remove('hidden'); // Show the reminder generation section
-                // Reset the reminder output and input field when starting a new generation
-                reminderOutput.innerHTML = '<p class="text-gray-500 text-sm">Your generated medication reminder will appear here.</p>';
-                medicationNameInput.value = '';
-                // Ensure correct styling is applied after resetting
-                reminderOutput.classList.remove('bg-red-100', 'border-red-300');
-                reminderOutput.classList.add('bg-gray-100', 'border-gray-200');
-            });
+  <footer>
+    <p>🧠 All data saved in your browser. No login required.</p>
+    <p>📅 Updated: <span id="lastUpdated"></span></p>
+    <p>✅ Made for loved ones who forget pills.</p>
+  </footer>
 
-            /**
-             * Event listener for the 'No' button.
-             * Displays a polite message and then hides the initial question section.
-             */
-            noButton.addEventListener('click', () => {
-                // Update the initial question section with a farewell message
-                initialQuestion.innerHTML = '<p class="text-xl font-semibold text-gray-600">No problem! Have a great day.</p>';
-                // Hide the section after a short delay to allow the message to be seen
-                setTimeout(() => {
-                    initialQuestion.classList.add('hidden');
-                }, 2000); // 2-second delay
-            });
+  <script>
+    const today = new Date().toDateString();
+    document.getElementById("today-date").textContent = "📅 " + today;
 
-            /**
-             * Event listener for the 'Generate Reminder Message' button.
-             * Handles input validation, API call to Gemini, and display of results or errors.
-             */
-            generateReminderButton.addEventListener('click', async () => {
-                const medicationName = medicationNameInput.value.trim();
+    const medListEl = document.getElementById("medList");
+    const progressEl = document.getElementById("progressText");
 
-                // Input validation: Check if medication name is provided
-                if (!medicationName) {
-                    reminderOutput.innerHTML = '<p class="text-red-600 font-semibold">Please enter a medication name to generate a reminder.</p>';
-                    reminderOutput.classList.remove('bg-gray-100'); // Remove default background
-                    reminderOutput.classList.add('bg-red-100', 'border-red-300'); // Add error styling
-                    return; // Stop execution if input is empty
-                }
+    let meds = JSON.parse(localStorage.getItem("medications")) || [];
+    let taken = JSON.parse(localStorage.getItem("takenMeds_" + today)) || [];
 
-                // Show loading indicator and disable the button to prevent multiple clicks
-                loadingIndicator.classList.remove('hidden');
-                generateReminderButton.disabled = true;
-                reminderOutput.innerHTML = ''; // Clear any previous output
-                // Reset styling to default before new generation
-                reminderOutput.classList.remove('bg-red-100', 'border-red-300');
-                reminderOutput.classList.add('bg-gray-100', 'border-gray-200');
+    function renderMeds() {
+      medListEl.innerHTML = "";
+      meds.forEach((med, index) => {
+        const medDiv = document.createElement("div");
+        medDiv.className = "med" + (taken.includes(index) ? " taken" : "");
+        medDiv.innerHTML = `
+          <strong>${med}</strong><br>
+          <button onclick="markTaken(${index})">${taken.includes(index) ? "✓ Taken" : "Mark as Taken"}</button>
+        `;
+        medListEl.appendChild(medDiv);
+      });
+      progressEl.textContent = `Progress: ${taken.length} / ${meds.length} taken`;
+      document.getElementById("lastUpdated").textContent = new Date().toLocaleTimeString();
+    }
 
-                try {
-                    // Construct the prompt for the Large Language Model (LLM)
-                    // The prompt guides the LLM to generate a specific type of output (concise, friendly reminder).
-                    const prompt = `Generate a concise, friendly, and helpful medication reminder message for "${medicationName}".
-                                    If common usage implies a specific frequency (e.g., "daily"), suggest it.
-                                    If not, provide a general reminder.
-                                    Examples:
-                                    - "Time to take your Ibuprofen! Remember to follow dosage instructions."
-                                    - "Don't forget your daily Insulin shot, ideally at 8 AM as prescribed."
-                                    - "It's time for your antibiotic. Make sure to complete the full course!"
-                                    Keep the message under 100 words.`;
+    function addMed() {
+      const name = document.getElementById("medInput").value.trim();
+      if (name) {
+        meds.push(name);
+        localStorage.setItem("medications", JSON.stringify(meds));
+        document.getElementById("medInput").value = "";
+        renderMeds();
+      }
+    }
 
-                    // Prepare the request payload for the Gemini API
-                    const chatHistory = [];
-                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                    const payload = { contents: chatHistory };
+    function markTaken(index) {
+      if (!taken.includes(index)) {
+        taken.push(index);
+        localStorage.setItem("takenMeds_" + today, JSON.stringify(taken));
+        renderMeds();
+      }
+    }
 
-                    // Make the asynchronous API call to the Gemini 2.0 Flash model
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+    renderMeds();
+  </script>
 
-                    // Check if the HTTP response was successful (status code 200-299)
-                    if (!response.ok) {
-                        const errorData = await response.json(); // Parse error details if available
-                        console.error("API Error:", errorData);
-                        // Throw an error with a user-friendly message based on API response
-                        throw new Error(`API call failed: ${errorData.error?.message || response.statusText}. Please try again.`);
-                    }
-
-                    const result = await response.json(); // Parse the JSON response from the API
-
-                    // Extract the generated text from the successful API response
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0) {
-                        const generatedText = result.candidates[0].content.parts[0].text;
-                        reminderOutput.textContent = generatedText; // Display the generated text
-                    } else {
-                        // Handle cases where the API response structure is not as expected
-                        reminderOutput.innerHTML = '<p class="text-red-600 font-semibold">Could not generate a reminder. Unexpected response from API.</p>';
-                        reminderOutput.classList.remove('bg-gray-100');
-                        reminderOutput.classList.add('bg-red-100', 'border-red-300');
-                        console.warn("Unexpected API response structure:", result);
-                    }
-
-                } catch (error) {
-                    // Catch any errors that occur during the fetch operation or response processing
-                    console.error("Error generating reminder:", error);
-                    // Display an error message to the user
-                    reminderOutput.innerHTML = `<p class="text-red-600 font-semibold">Error: ${error.message}. Please check your internet connection or try again later.</p>`;
-                    reminderOutput.classList.remove('bg-gray-100');
-                    reminderOutput.classList.add('bg-red-100', 'border-red-300');
-                } finally {
-                    // This block always executes, regardless of success or failure
-                    loadingIndicator.classList.add('hidden'); // Hide the loading indicator
-                    generateReminderButton.disabled = false; // Re-enable the button
-                }
-            });
-        });
-    </script>
 </body>
 </html>
