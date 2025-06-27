@@ -4,97 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Hub Pro</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#4f46e5',
-                        secondary: '#10b981',
-                        accent: '#f59e0b',
-                        danger: '#ef4444',
-                        info: '#3b82f6'
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Custom CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="min-h-screen p-4 md:p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
-    <!-- Header -->
-    <header class="flex justify-between items-center mb-8">
-        <div class="flex items-center">
-            <div class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white text-2xl mr-3">
-                <i class="fas fa-heartbeat"></i>
+<body class="min-h-screen p-4 md:p-6 bg-gray-50">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <div class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white text-2xl mr-3">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Health Hub Pro</h1>
+                    <p class="text-gray-600">Your health companion</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">Health Hub Pro</h1>
-                <p class="text-gray-600">Your health companion</p>
-            </div>
-        </div>
-        <!-- Notification and profile buttons would go here -->
-    </header>
+        </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto">
-        <!-- Health Summary Card -->
-        <div class="glass-card p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">Today's Summary</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Water Tracker -->
-                <div class="bg-blue-50 p-4 rounded-lg flex items-center">
-                    <div class="mr-3 text-blue-600 text-2xl">
+        <!-- Health Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Water Card -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center mb-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
                         <i class="fas fa-tint"></i>
                     </div>
-                    <div>
-                        <h3 class="text-sm font-medium">Water Intake</h3>
-                        <p class="text-xl font-bold"><span id="waterConsumed">0.8</span>/2.5 L</p>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: 32%"></div>
-                        </div>
-                    </div>
+                    <h2 class="text-xl font-semibold">Water Intake</h2>
                 </div>
-                <!-- Medication Tracker -->
-                <div class="bg-green-50 p-4 rounded-lg flex items-center">
-                    <div class="mr-3 text-green-600 text-2xl">
+                <p class="text-2xl font-bold mb-2"><span id="waterConsumed">0.8</span>/<span id="waterGoal">2.5</span> L</p>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 32%"></div>
+                </div>
+            </div>
+
+            <!-- Medications Card -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center mb-4">
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
                         <i class="fas fa-pills"></i>
                     </div>
-                    <div>
-                        <h3 class="text-sm font-medium">Medications</h3>
-                        <p class="text-xl font-bold"><span id="medsTaken">2</span>/<span id="medsTotal">5</span></p>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                            <div class="bg-green-600 h-2.5 rounded-full" style="width: 40%"></div>
-                        </div>
-                    </div>
+                    <h2 class="text-xl font-semibold">Medications</h2>
                 </div>
-                <!-- Activity Tracker -->
-                <div class="bg-purple-50 p-4 rounded-lg flex items-center">
-                    <div class="mr-3 text-purple-600 text-2xl">
+                <p class="text-2xl font-bold mb-2"><span id="medsTaken">2</span>/<span id="medsTotal">5</span></p>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-green-600 h-2.5 rounded-full" style="width: 40%"></div>
+                </div>
+            </div>
+
+            <!-- Activity Card -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <div class="flex items-center mb-4">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mr-3">
                         <i class="fas fa-walking"></i>
                     </div>
-                    <div>
-                        <h3 class="text-sm font-medium">Activity</h3>
-                        <p class="text-xl font-bold"><span id="stepsCount">4,320</span> steps</p>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                            <div class="bg-purple-600 h-2.5 rounded-full" style="width: 65%"></div>
-                        </div>
-                    </div>
+                    <h2 class="text-xl font-semibold">Activity</h2>
+                </div>
+                <p class="text-2xl font-bold mb-2"><span id="stepsCount">4,320</span> steps</p>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-purple-600 h-2.5 rounded-full" style="width: 65%"></div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Rest of your HTML content -->
-        <!-- Medication tracker, water tracker, etc. -->
-        
-    </main>
-
-    <!-- JavaScript -->
     <script src="scripts.js"></script>
 </body>
 </html>
