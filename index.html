@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>💊 Did I Take My Meds Today?</title>
-  <meta name="description" content="A simple, one-click daily pill tracker. Never forget your meds again. Works offline!">
-  <meta property="og:title" content="Did I Take My Meds Today?">
-  <meta property="og:description" content="A simple, one-click daily medication reminder app.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💊 Daily Med Tracker</title>
+  <meta name="description" content="Track multiple medications daily, view progress, and get smart reminders.">
+  <meta property="og:title" content="Daily Med Tracker">
+  <meta property="og:description" content="Free tool to track multiple medications, get reminders, and view your progress">
   <meta property="og:image" content="https://your-site.com/preview.png">
   <meta property="og:url" content="https://your-site.com">
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2936/2936905.png" type="image/png">
@@ -15,136 +15,124 @@
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f9f9f9;
+      background: #f9f9f9;
       color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      text-align: center;
-      transition: background 0.3s, color 0.3s;
+      padding: 2rem;
     }
-    .container {
-      max-width: 400px;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 0.5rem;
-    }
-    #date {
-      font-weight: 600;
-      color: #555;
-      margin-bottom: 20px;
-    }
-    #pill-button {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .taken {
-      background-color: #4CAF50;
-      color: #fff;
-    }
-    .not-taken {
-      background-color: #FF5252;
-      color: #fff;
-    }
-    #reset-btn {
-      margin-top: 15px;
-      padding: 10px 18px;
-      background: #444;
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; text-align: center; }
+    #date { margin-bottom: 1rem; font-weight: bold; }
+    .med-entry { margin: 10px 0; display: flex; gap: 10px; }
+    input[type="text"] { padding: 8px; width: 150px; }
+    .taken-btn {
+      background: #ff5252;
       color: white;
       border: none;
-      border-radius: 6px;
+      padding: 8px 12px;
       cursor: pointer;
+      border-radius: 5px;
     }
-    #dark-toggle {
-      margin-top: 25px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: #888;
-      text-decoration: underline;
-    }
-    .dark {
-      background-color: #121212;
-      color: #f0f0f0;
-    }
-    .dark #pill-button.taken {
-      background-color: #388e3c;
-    }
-    .dark #pill-button.not-taken {
-      background-color: #d32f2f;
-    }
-    .adsense, .affiliate {
-      margin: 20px 0;
-      padding: 15px;
-      background: #eee;
-      border-radius: 8px;
-    }
-    a {
-      color: #1976D2;
-      text-decoration: none;
-    }
+    .taken-btn.taken { background: #4CAF50; }
+    #graph { width: 100%; max-width: 500px; margin-top: 2rem; }
+    .footer { margin-top: 3rem; font-size: 0.85rem; color: #777; text-align: center; }
+    .disclaimer { font-size: 0.75rem; color: #999; margin-top: 1rem; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>💊 Did I Take My Meds Today?</h1>
-    <p id="date"></p>
-    <button id="pill-button" class="not-taken">NO</button>
-    <p>Click the button when you've taken your meds today.</p>
-    <button id="reset-btn">Reset for Tomorrow</button>
+  <h1>💊 Daily Med Tracker</h1>
+  <div id="date"></div>
+  <div id="med-list"></div>
+  <div class="med-entry">
+    <input type="text" id="new-med" placeholder="Add Medication...">
+    <button onclick="addMed()">Add</button>
+  </div>
+  <canvas id="graph"></canvas>
 
-    <div class="adsense">[🧾 Your AdSense Code Here]</div>
-    <div class="affiliate">
-      Recommended: <a href="#" id="amazon-link" target="_blank">Best Pill Organizer</a>
-    </div>
-
-    <div id="dark-toggle">🌙 Toggle Dark Mode</div>
+  <div class="disclaimer">
+    ⚠️ This tool is for **personal wellness tracking only** and does not replace medical advice.
   </div>
 
+  <div class="footer">
+    Free to use • No login • Works offline<br>
+    Built for those who care ❤️
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    const medList = document.getElementById("med-list");
+    const dateElem = document.getElementById("date");
     const today = new Date().toDateString();
-    document.getElementById("date").textContent = today;
+    dateElem.textContent = `Today: ${today}`;
 
-    const button = document.getElementById("pill-button");
-    const lastTaken = localStorage.getItem("lastTaken");
+    let meds = JSON.parse(localStorage.getItem("medications")) || [];
+    let taken = JSON.parse(localStorage.getItem("takenStatus")) || {};
 
-    if (lastTaken === today) {
-      button.textContent = "YES";
-      button.classList.add("taken");
+    function renderMeds() {
+      medList.innerHTML = "";
+      meds.forEach((med, index) => {
+        const isTaken = taken[today]?.includes(med);
+        const div = document.createElement("div");
+        div.className = "med-entry";
+        div.innerHTML = `
+          <span>${med}</span>
+          <button class="taken-btn ${isTaken ? 'taken' : ''}" onclick="toggleTaken('${med}')">
+            ${isTaken ? 'Taken' : 'Mark Taken'}
+          </button>
+        `;
+        medList.appendChild(div);
+      });
     }
 
-    button.addEventListener("click", () => {
-      button.textContent = "YES";
-      button.classList.remove("not-taken");
-      button.classList.add("taken");
-      localStorage.setItem("lastTaken", today);
-    });
+    function addMed() {
+      const input = document.getElementById("new-med");
+      const val = input.value.trim();
+      if (val && !meds.includes(val)) {
+        meds.push(val);
+        localStorage.setItem("medications", JSON.stringify(meds));
+        renderMeds();
+      }
+      input.value = "";
+    }
 
-    document.getElementById("reset-btn").addEventListener("click", () => {
-      button.textContent = "NO";
-      button.classList.remove("taken");
-      button.classList.add("not-taken");
-    });
+    function toggleTaken(med) {
+      if (!taken[today]) taken[today] = [];
+      const idx = taken[today].indexOf(med);
+      if (idx > -1) taken[today].splice(idx, 1);
+      else taken[today].push(med);
+      localStorage.setItem("takenStatus", JSON.stringify(taken));
+      renderMeds();
+      drawGraph();
+    }
 
-    document.getElementById("amazon-link").href = "https://www.amazon.com/s?k=pill+organizer&tag=yourtag-20";
+    function drawGraph() {
+      const dates = Object.keys(taken).slice(-7);
+      const values = dates.map(date => taken[date]?.length || 0);
+      const ctx = document.getElementById('graph').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Meds Taken',
+            data: values,
+            fill: false,
+            borderColor: 'blue'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+          }
+        }
+      });
+    }
 
-    // Dark mode toggle
-    const toggle = document.getElementById("dark-toggle");
-    const root = document.body;
-    if (localStorage.getItem("darkMode") === "true") root.classList.add("dark");
-
-    toggle.addEventListener("click", () => {
-      root.classList.toggle("dark");
-      localStorage.setItem("darkMode", root.classList.contains("dark"));
-    });
+    renderMeds();
+    drawGraph();
   </script>
 </body>
 </html>
