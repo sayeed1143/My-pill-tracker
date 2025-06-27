@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Did I Take My Meds Today?</title>
+  <meta name="description" content="Never forget your pills again - One-click medication tracker">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      text-align: center;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    #pill-button {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      margin: 30px auto;
+      transition: all 0.3s;
+    }
+    .taken {
+      background: #4CAF50;
+      color: white;
+    }
+    .not-taken {
+      background: #FF5252;
+      color: white;
+    }
+    #reset-btn {
+      padding: 10px 20px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>💊 Did I Take My Meds Today?</h1>
+  <p id="date"></p>
+  
+  <button id="pill-button" class="not-taken">NO</button>
+  
+  <p>Click above when you take your medication</p>
+  <button id="reset-btn">Reset for Tomorrow</button>
+
+  <!-- AdSense Placeholder -->
+  <div style="margin: 30px auto; padding: 20px; background: #f5f5f5;">
+    [AdSense will go here]
+  </div>
+
+  <!-- Affiliate link placeholder -->
+  <p>Recommended: <a href="#" id="amazon-link">Pill Organizer</a></p>
+
+  <script>
+    // Set today's date
+    document.getElementById('date').textContent = new Date().toDateString();
+    
+    // Check localStorage
+    const today = new Date().toDateString();
+    const lastTaken = localStorage.getItem('lastTakenDate');
+    const button = document.getElementById('pill-button');
+    
+    if (lastTaken === today) {
+      button.textContent = 'YES';
+      button.classList.add('taken');
+      button.classList.remove('not-taken');
+    }
+    
+    // Button click handler
+    button.addEventListener('click', () => {
+      button.textContent = 'YES';
+      button.classList.add('taken');
+      button.classList.remove('not-taken');
+      localStorage.setItem('lastTakenDate', today);
+    });
+    
+    // Reset for next day
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      button.textContent = 'NO';
+      button.classList.add('not-taken');
+      button.classList.remove('taken');
+    });
+    
+    // Affiliate link (replace with your Amazon Associates link)
+    document.getElementById('amazon-link').href = 
+      "https://www.amazon.com/s?k=pill+organizer&tag=yourtag-20";
+  </script>
+</body>
+</html>
